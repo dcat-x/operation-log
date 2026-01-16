@@ -17,8 +17,8 @@ class Setting extends Form
 
     protected function formatInput(array $input): array
     {
-        $input['except'] = Helper::array($input['except']);
-        $input['allowed_methods'] = Helper::array($input['allowed_methods']);
+        $input['except'] = Helper::array($input['except'] ?? []);
+        $input['allowed_methods'] = Helper::array($input['allowed_methods'] ?? []);
 
         return $input;
     }

@@ -27,42 +27,44 @@ class LogController
         return new Grid(OperationLog::with('user'), function (Grid $grid): void {
             $grid->column('id', 'ID')->sortable();
             $grid->column('user', trans('admin.user'))
-                ->display(function ($user) {
+                ->display(function ($user): ?string {
                     if (! $user) {
-                        return;
+                        return null;
                     }
 
                     $user = Helper::array($user);
 
-                    return $user['name'] ?? ($user['username'] ?? $user['id']);
+                    return $user['name'] ?? $user['username'] ?? (string) $user['id'];
                 })
-                ->link(function () {
+                ->link(function (): ?string {
                     if ($this->user) {
                         return admin_url('auth/users/'.$this->user['id']);
                     }
+
+                    return null;
                 });
 
             $grid->column('method', trans('admin.method'))
                 ->label(OperationLog::$methodColors)
                 ->filterByValue();
 
-            $grid->column('path', trans('admin.uri'))->display(function ($v) {
+            $grid->column('path', trans('admin.uri'))->display(function ($v): string {
                 return "<code>$v</code>";
             })->filterByValue();
 
             $grid->column('ip', 'IP')->filterByValue();
 
-            $grid->column('input')->display(function ($input) {
+            $grid->column('input')->display(function ($input): ?string {
                 $input = json_decode($input, true);
 
                 if (empty($input)) {
-                    return;
+                    return null;
                 }
 
                 $input = Arr::except($input, ['_pjax', '_token', '_method', '_previous_']);
 
                 if (empty($input)) {
-                    return;
+                    return null;
                 }
 
                 return '<pre class="dump" style="max-width: 500px">'.json_encode($input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE).'</pre>';
@@ -97,7 +99,7 @@ class LogController
         });
     }
 
-    public function destroy(mixed $id): JsonResponse
+    public function destroy(int|string $id): JsonResponse
     {
         $ids = explode(',', (string) $id);
 

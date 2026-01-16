@@ -54,12 +54,12 @@ class LogOperation
     protected function formatInput(array $input): string
     {
         foreach ($this->getSecretFields() as $field) {
-            if ($field && ! empty($input[$field])) {
+            if ($field && isset($input[$field]) && is_string($input[$field])) {
                 $input[$field] = Str::limit($input[$field], 3, '******');
             }
         }
 
-        return json_encode($input, JSON_UNESCAPED_UNICODE);
+        return json_encode($input, JSON_UNESCAPED_UNICODE) ?: '{}';
     }
 
     protected function setting(string $key, mixed $default = null): mixed
@@ -81,7 +81,7 @@ class LogOperation
             return true;
         }
 
-        return $allowedMethods->map(fn ($method) => strtoupper($method))->contains($method);
+        return $allowedMethods->map(fn ($m) => strtoupper($m))->contains($method);
     }
 
     protected function inExceptArray(Request $request): bool
